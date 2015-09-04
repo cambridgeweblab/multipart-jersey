@@ -15,12 +15,12 @@ import java.io.InputStream;
  * @since 26/06/15
  */
 class JerseyMultipartFileAdapter implements MultipartFile {
-    private final BodyPart finalFile;
+    private final BodyPart bodyPart;
     byte[] fileData;
 
-    public JerseyMultipartFileAdapter(BodyPart finalFile) throws IOException {
-        this.finalFile = finalFile;
-        fileData = finalFile != null ? FileCopyUtils.copyToByteArray(((BodyPartEntity) finalFile.getEntity()).getInputStream()) : new byte[0];
+    public JerseyMultipartFileAdapter(BodyPart bodyPart) throws IOException {
+        this.bodyPart = bodyPart;
+        this.fileData = bodyPart != null ? FileCopyUtils.copyToByteArray(((BodyPartEntity) bodyPart.getEntity()).getInputStream()) : new byte[0];
     }
 
     @Override
@@ -30,12 +30,12 @@ class JerseyMultipartFileAdapter implements MultipartFile {
 
     @Override
     public String getOriginalFilename() {
-        return finalFile != null ? finalFile.getContentDisposition().getFileName() : null;
+        return bodyPart != null ? bodyPart.getContentDisposition().getFileName() : null;
     }
 
     @Override
     public String getContentType() {
-        return finalFile != null ? finalFile.getMediaType().toString() : null;
+        return bodyPart != null ? bodyPart.getMediaType().toString() : null;
     }
 
     @Override
@@ -50,7 +50,7 @@ class JerseyMultipartFileAdapter implements MultipartFile {
 
     @Override
     public byte[] getBytes() throws IOException {
-        return finalFile != null ? fileData : null;
+        return bodyPart != null ? fileData : null;
     }
 
     @Override

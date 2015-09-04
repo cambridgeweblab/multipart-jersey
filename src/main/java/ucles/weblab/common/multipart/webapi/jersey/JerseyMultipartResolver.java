@@ -1,5 +1,6 @@
 package ucles.weblab.common.multipart.webapi.jersey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
@@ -14,9 +15,69 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class JerseyMultipartResolver implements MultipartResolver {
 
-    // TODO: Use MultipartProperties for max size etc.
-    //   @Autowired
-    //   private MultipartProperties multipartProperties = new MultipartProperties();
+    // Same properties as Commons FileUpload
+
+    /**
+     * The maximum size permitted for the complete request, as opposed to
+     * {@link #fileSizeMax}. A value of -1 indicates no maximum.
+     */
+    private long sizeMax = -1;
+
+    /**
+     * The maximum size permitted for a single uploaded file, as opposed
+     * to {@link #sizeMax}. A value of -1 indicates no maximum.
+     */
+    private long fileSizeMax = -1;
+
+    /**
+     * Returns the maximum allowed size of a complete request, as opposed
+     * to {@link #getFileSizeMax()}.
+     *
+     * @return The maximum allowed size, in bytes. The default value of
+     *   -1 indicates, that there is no limit.
+     *
+     * @see #setSizeMax(long)
+     *
+     */
+    public long getSizeMax() {
+        return sizeMax;
+    }
+
+    /**
+     * Sets the maximum allowed size of a complete request, as opposed
+     * to {@link #setFileSizeMax(long)}.
+     *
+     * @param sizeMax The maximum allowed size, in bytes. The default value of
+     *   -1 indicates, that there is no limit.
+     *
+     * @see #getSizeMax()
+     *
+     */
+    public void setSizeMax(long sizeMax) {
+        this.sizeMax = sizeMax;
+    }
+
+    /**
+     * Returns the maximum allowed size of a single uploaded file,
+     * as opposed to {@link #getSizeMax()}.
+     *
+     * @see #setFileSizeMax(long)
+     * @return Maximum size of a single uploaded file.
+     */
+    public long getFileSizeMax() {
+        return fileSizeMax;
+    }
+
+    /**
+     * Sets the maximum allowed size of a single uploaded file,
+     * as opposed to {@link #getSizeMax()}.
+     *
+     * @see #getFileSizeMax()
+     * @param fileSizeMax Maximum size of a single uploaded file.
+     */
+    public void setFileSizeMax(long fileSizeMax) {
+        this.fileSizeMax = fileSizeMax;
+    }
 
     @Override
     public boolean isMultipart(HttpServletRequest request) {
@@ -30,7 +91,7 @@ public class JerseyMultipartResolver implements MultipartResolver {
 
     @Override
     public MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) throws MultipartException {
-        return new JerseyMultipartHttpServletRequest(request);
+        return new JerseyMultipartHttpServletRequest(request, sizeMax, fileSizeMax);
     }
 
     @Override
