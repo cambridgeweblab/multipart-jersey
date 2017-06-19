@@ -52,8 +52,10 @@ class JerseyMultipartHttpServletRequest extends AbstractMultipartHttpServletRequ
             if (requestSize >= 0 && sizeMax >= 0 && requestSize > sizeMax) {
                 throw new MultipartException("Multipart request rejected because the overall size ("
                         + requestSize + ") exceeds the maximum configured (" + sizeMax + ")");
-            } else if (sizeMax >= 0) {
+            } else if (sizeMax >= 0 && requestSize < 0) {
                 log.warn("Multipart request size not known - could not be checked against maximum (" + sizeMax + ")");
+            } else {
+                log.debug("Multipart request size [" + requestSize + "] max size [" + sizeMax + "]");
             }
             final MediaType contentType = MediaType.parseMediaType(request.getHeader(HttpHeaders.CONTENT_TYPE));
             final MultivaluedMap<String, String> userAgentHeader = new MultivaluedHashMap<String, String>() {{
