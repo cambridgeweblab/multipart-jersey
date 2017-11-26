@@ -1,11 +1,11 @@
 package ucles.weblab.common.multipart.webapi.jersey;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
 
 /**
  * Uses Jersey to resolve multipart file contents.
@@ -86,7 +86,7 @@ public class JerseyMultipartResolver implements MultipartResolver {
             return false;
         }
         String contentType = request.getContentType();
-        return (contentType != null && contentType.toLowerCase().startsWith("multipart/"));
+        return contentType != null && contentType.toLowerCase(Locale.getDefault()).startsWith("multipart/");
     }
 
     @Override
@@ -96,7 +96,7 @@ public class JerseyMultipartResolver implements MultipartResolver {
 
     @Override
     public void cleanupMultipart(MultipartHttpServletRequest request) {
-        if (request != null && request instanceof JerseyMultipartHttpServletRequest) {
+        if (request instanceof JerseyMultipartHttpServletRequest) {
             ((JerseyMultipartHttpServletRequest) request).cleanup();
         }
     }

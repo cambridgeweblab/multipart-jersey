@@ -15,20 +15,15 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 
 import static javax.ws.rs.core.MediaType.CHARSET_PARAMETER;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
@@ -45,7 +40,8 @@ class JerseyMultipartHttpServletRequest extends AbstractMultipartHttpServletRequ
     final MultiValueMap<String, MultipartFile> multipartFiles = new LinkedMultiValueMap<>();
     final MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
 
-    public JerseyMultipartHttpServletRequest(HttpServletRequest request, long sizeMax, long fileSizeMax) throws MultipartException {
+    @SuppressWarnings("PMD.NonStaticInitializer")
+    JerseyMultipartHttpServletRequest(HttpServletRequest request, long sizeMax, long fileSizeMax) throws MultipartException {
         super(request);
         try {
             long requestSize = request.getContentLengthLong();
@@ -70,20 +66,22 @@ class JerseyMultipartHttpServletRequest extends AbstractMultipartHttpServletRequ
                     final String formField = ((FormDataContentDisposition) bodyPart.getContentDisposition()).getName();
                     parts.add(formField, bodyPart);
                     final Optional<javax.ws.rs.core.MediaType> mediaType = Optional.ofNullable(bodyPart.getMediaType());
-                    if (bodyPart.getContentDisposition().getFileName() != null) {
+                    if (bodyPart.getContentDisposition().getFileName() == null) {
+                        if (mediaType.map(m -> m.isCompatible(TEXT_PLAIN_TYPE)).orElse(true)) {
+                            final Charset charset = mediaType
+                                    .map(m -> m.getParameters().get(CHARSET_PARAMETER))
+                                    .map(Charset::forName).orElse(StandardCharsets.ISO_8859_1);
+                            try (InputStream formDataStream = ((BodyPartEntity) bodyPart.getEntity()).getInputStream()) {
+                                parameters.add(formField,
+                                        new Scanner(new InputStreamReader(formDataStream, charset)).useDelimiter("\\A").next());
+                            }
+                        }
+                    } else {
                         JerseyMultipartFileAdapter multipartFile = new JerseyMultipartFileAdapter(bodyPart);
                         if (fileSizeMax >= 0 && multipartFile.getSize() > fileSizeMax) {
                             throw new MaxUploadSizeExceededException(fileSizeMax);
                         }
                         multipartFiles.add(formField, multipartFile);
-                    } else if (mediaType.map(m -> m.isCompatible(TEXT_PLAIN_TYPE)).orElse(true)) {
-                        final Charset charset = mediaType
-                                .map(m -> m.getParameters().get(CHARSET_PARAMETER))
-                                .map(Charset::forName).orElse(StandardCharsets.ISO_8859_1);
-                        try (InputStream formDataStream = ((BodyPartEntity) bodyPart.getEntity()).getInputStream()) {
-                            parameters.add(formField,
-                                    new Scanner(new InputStreamReader(formDataStream, charset)).useDelimiter("\\A").next());
-                        }
                     }
                 }
             }
@@ -107,7 +105,7 @@ class JerseyMultipartHttpServletRequest extends AbstractMultipartHttpServletRequ
     @Override
     public String getMultipartContentType(String paramOrFileName) {
         final BodyPart part = parts.getFirst(paramOrFileName);
-        return part != null ? part.getMediaType().toString() : null;
+        return part == null ? null : part.getMediaType().toString();
     }
 
     @Override

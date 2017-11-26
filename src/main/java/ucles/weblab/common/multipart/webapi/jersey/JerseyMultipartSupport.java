@@ -20,10 +20,11 @@ import javax.ws.rs.ext.Providers;
  *
  * @since 26/06/15
  */
-public class JerseyMultipartSupport {
+public final class JerseyMultipartSupport {
     private JerseyMultipartSupport() { // Prevent instantiation
     }
 
+    @SuppressWarnings("PMD.NonStaticInitializer")
     static MultiPartReaderClientSide createJerseyMultiPartReader() {
         final MultiPartReaderClientSide readerClientSide = new MultiPartReaderClientSide(new Providers() {
             @Override

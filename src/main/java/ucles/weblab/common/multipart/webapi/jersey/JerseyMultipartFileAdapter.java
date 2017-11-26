@@ -18,9 +18,10 @@ class JerseyMultipartFileAdapter implements MultipartFile {
     private final BodyPart bodyPart;
     byte[] fileData;
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public JerseyMultipartFileAdapter(BodyPart bodyPart) throws IOException {
         this.bodyPart = bodyPart;
-        this.fileData = bodyPart != null ? FileCopyUtils.copyToByteArray(((BodyPartEntity) bodyPart.getEntity()).getInputStream()) : new byte[0];
+        this.fileData = bodyPart == null ? new byte[0] : FileCopyUtils.copyToByteArray(((BodyPartEntity) bodyPart.getEntity()).getInputStream());
     }
 
     @Override
@@ -30,12 +31,12 @@ class JerseyMultipartFileAdapter implements MultipartFile {
 
     @Override
     public String getOriginalFilename() {
-        return bodyPart != null ? bodyPart.getContentDisposition().getFileName() : null;
+        return bodyPart == null ? null : bodyPart.getContentDisposition().getFileName();
     }
 
     @Override
     public String getContentType() {
-        return bodyPart != null ? bodyPart.getMediaType().toString() : null;
+        return bodyPart == null ? null : bodyPart.getMediaType().toString();
     }
 
     @Override
@@ -50,7 +51,7 @@ class JerseyMultipartFileAdapter implements MultipartFile {
 
     @Override
     public byte[] getBytes() throws IOException {
-        return bodyPart != null ? fileData : null;
+        return bodyPart == null ? null : fileData;
     }
 
     @Override
