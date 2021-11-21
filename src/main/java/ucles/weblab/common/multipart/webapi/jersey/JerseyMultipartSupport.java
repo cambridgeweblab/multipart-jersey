@@ -26,7 +26,7 @@ public final class JerseyMultipartSupport {
 
     @SuppressWarnings("PMD.NonStaticInitializer")
     static MultiPartReaderClientSide createJerseyMultiPartReader() {
-        final MultiPartReaderClientSide readerClientSide = new MultiPartReaderClientSide(new Providers() {
+        return new MultiPartReaderClientSide(new Providers() {
             @Override
             public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> aClass, Type type, Annotation[] annotations, javax.ws.rs.core.MediaType mediaType) {
                 return null;
@@ -54,6 +54,5 @@ public final class JerseyMultipartSupport {
             ReflectionUtils.makeAccessible(messageBodyWorkers);
             ReflectionUtils.setField(messageBodyWorkers, this, (Provider<MessageBodyWorkers>) () -> null);
         }};
-        return readerClientSide;
     }
 }

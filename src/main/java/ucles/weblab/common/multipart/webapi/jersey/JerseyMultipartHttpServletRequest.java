@@ -45,7 +45,7 @@ class JerseyMultipartHttpServletRequest extends AbstractMultipartHttpServletRequ
         super(request);
         try {
             long requestSize = request.getContentLengthLong();
-            if (requestSize >= 0 && sizeMax >= 0 && requestSize > sizeMax) {
+            if (sizeMax >= 0 && requestSize > sizeMax) {
                 throw new MultipartException("Multipart request rejected because the overall size ("
                         + requestSize + ") exceeds the maximum configured (" + sizeMax + ")");
             } else if (sizeMax >= 0 && requestSize < 0) {
@@ -135,6 +135,6 @@ class JerseyMultipartHttpServletRequest extends AbstractMultipartHttpServletRequ
     }
 
     String[] toStringArray(List<String> strings) {
-        return strings == null || strings.isEmpty() ? null : strings.toArray(new String[strings.size()]);
+        return strings == null || strings.isEmpty() ? null : strings.toArray(new String[0]);
     }
 }

@@ -16,7 +16,7 @@ import java.io.InputStream;
  */
 class JerseyMultipartFileAdapter implements MultipartFile {
     private final BodyPart bodyPart;
-    byte[] fileData;
+    private final byte[] fileData;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public JerseyMultipartFileAdapter(BodyPart bodyPart) throws IOException {
@@ -50,17 +50,17 @@ class JerseyMultipartFileAdapter implements MultipartFile {
     }
 
     @Override
-    public byte[] getBytes() throws IOException {
+    public byte[] getBytes() {
         return bodyPart == null ? null : fileData;
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void transferTo(File dest) throws IOException, IllegalStateException {
+    public void transferTo(File dest) throws IllegalStateException {
         throw new UnsupportedOperationException();
     }
 }

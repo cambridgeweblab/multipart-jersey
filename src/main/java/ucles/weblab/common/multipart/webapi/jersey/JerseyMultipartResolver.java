@@ -82,7 +82,7 @@ public class JerseyMultipartResolver implements MultipartResolver {
     @Override
     public boolean isMultipart(HttpServletRequest request) {
         // Same check as in Commons FileUpload...
-        if (!"post".equals(request.getMethod().toLowerCase())) {
+        if (!"post".equalsIgnoreCase(request.getMethod())) {
             return false;
         }
         String contentType = request.getContentType();
